@@ -360,4 +360,87 @@ router.post(
   }
 );
 
+/**
+ * POST /api/transaction-status
+ * Check on-chain confirmation of a submitted transaction.
+ * Frontend polls this after sending to get confirmed block/gas info.
+ *
+ * Body: { txHash: string, chainId?: string }
+ * Returns: { confirmed: bool, blockNumber?, gasUsed?, status? }
+ */
+router.post(
+  "/transaction-status",
+  [
+    body("txHash")
+      .trim()
+      .notEmpty()
+      .matches(/^0x[a-fA-F0-9]{64}$/)
+      .withMessage("Invalid transaction hash format"),
+    body("chainId")
+      .optional()
+      .isIn(["1", "137", "80001", "80002", "11155111", "56"])
+      .withMessage("Unsupported chain ID"),
+  ],
+  validate,
+  async (req, res, next) => {
+    try {
+      const { txHash, chainId = "1" } = req.body;
+
+      // Map chainId to public RPC endpoint
+      const RPC_MAP = {
+        "1":        "https://ethereum.publicnode.com",
+        "11155111": "https://sepolia.publicnode.com",
+        "137":      "https://polygon.publicnode.com",
+        "80001":    "https://polygon-mumbai.publicnode.com",
+        "80002":    "https://polygon-amoy.publicnode.com",
+        "56":       "https://bsc.publicnode.com",
+      };
+
+      const rpcUrl = RPC_MAP[chainId] || RPC_MAP["1"];
+
+      // Use JSON-RPC to fetch receipt
+      const rpcResponse = await fetch(rpcUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "eth_getTransactionReceipt",
+          params: [txHash],
+          id: 1,
+        }),
+      });
+
+      const rpcData = await rpcResponse.json();
+      const receipt = rpcData.result;
+
+      if (!receipt) {
+        return res.json({
+          success: true,
+          data: {
+            txHash,
+            confirmed: false,
+            message: "Transaction is still pending or not found",
+          },
+        });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          txHash,
+          confirmed: true,
+          blockNumber: parseInt(receipt.blockNumber, 16),
+          gasUsed: parseInt(receipt.gasUsed, 16),
+          status: receipt.status === "0x1" ? "success" : "failed",
+          from: receipt.from,
+          to: receipt.to,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 module.exports = router;
+

@@ -9,13 +9,16 @@ import {
   Activity, Settings, Bell, ChevronRight, Shield,
   AlertTriangle, XOctagon, TrendingUp, Clock,
   Globe, Cpu, ExternalLink, Copy, CheckCircle2,
-  Home, ArrowLeft, Dna,
+  Home, ArrowLeft, Dna, Wallet,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { analyzeWallet, preTransactionCheck, getAIDecision, type AnalysisResponse, type PreTransactionCheckResponse, type AIDecisionResponse } from "@/lib/api";
 import { InterceptorModal } from "@/components/InterceptorModal";
 import { DecisionCopilot } from "@/components/DecisionCopilot";
 import { WalletDNA } from "@/components/WalletDNA";
+import { WalletConnect } from "@/components/WalletConnect";
+import { SendTransaction } from "@/components/SendTransaction";
+import { useWallet } from "@/hooks/useWallet";
 
 /* ─────────────────────────────── helpers ─────────────────────────────────── */
 function cn(...c: (string | boolean | undefined)[]) {
@@ -27,13 +30,14 @@ const truncate = (s: string, start = 8, end = 6) =>
 
 /* ─────────────────────────────── types ──────────────────────────────────── */
 type AnalysisData = AnalysisResponse["data"];
-type ActiveView = "analyzer" | "sandbox" | "history" | "wallet-dna";
+type ActiveView = "analyzer" | "sandbox" | "history" | "wallet-dna" | "wallet";
 
 /* ─────────────────────────────── Sidebar ────────────────────────────────── */
 const NAV_ITEMS: { id: ActiveView; label: string; icon: React.ElementType; badge?: string }[] = [
   { id: "analyzer", label: "Wallet Analyzer", icon: Search },
   { id: "wallet-dna", label: "Wallet DNA", icon: Dna, badge: "New" },
-  { id: "sandbox", label: "TX Sandbox", icon: Send, badge: "Live" },
+  { id: "wallet", label: "My Wallet", icon: Wallet, badge: "Live" },
+  { id: "sandbox", label: "TX Sandbox", icon: Send },
   { id: "history", label: "History", icon: History },
 ];
 
@@ -116,14 +120,17 @@ function TopBar({
   isAutoProtect,
   setAutoProtect,
   activeView,
+  wallet,
 }: {
   isAutoProtect: boolean;
   setAutoProtect: (v: boolean) => void;
   activeView: ActiveView;
+  wallet: ReturnType<typeof useWallet>;
 }) {
   const titles: Record<ActiveView, { title: string; sub: string }> = {
     analyzer: { title: "Wallet Analyzer", sub: "Paste any address and run a full AI risk scan" },
     "wallet-dna": { title: "Wallet DNA", sub: "Generate a behavioral fingerprint and personality profile for any wallet" },
+    wallet: { title: "My Wallet", sub: "Connect MetaMask, view balance, and send transactions securely" },
     sandbox: { title: "Transaction Sandbox", sub: "Simulate and test the Auto-Protect interceptor" },
     history: { title: "Scan History", sub: "Previous wallet analyses and risk events" },
   };
@@ -136,7 +143,7 @@ function TopBar({
           <h1 className="text-white font-bold text-lg leading-none">{title}</h1>
           <p className="text-gray-500 text-xs mt-0.5">{sub}</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {/* Auto-Protect Toggle */}
           <button
             onClick={() => setAutoProtect(!isAutoProtect)}
@@ -154,6 +161,9 @@ function TopBar({
             <Shield className="w-3.5 h-3.5" />
             Auto-Protect {isAutoProtect ? "ON" : "OFF"}
           </button>
+
+          {/* Wallet Connect widget */}
+          <WalletConnect wallet={wallet} />
 
           {/* Notification bell placeholder */}
           <button className="relative w-9 h-9 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-gray-500 hover:text-white hover:border-white/20 transition-all">
@@ -779,10 +789,90 @@ function HistoryView() {
   );
 }
 
+/* ─────────────────────────────── Wallet View ────────────────────────────── */
+function WalletView({ wallet, isAutoProtect }: { wallet: ReturnType<typeof useWallet>; isAutoProtect: boolean }) {
+  return (
+    <div className="space-y-6">
+      {/* Connected wallet info card — shown when connected */}
+      {wallet.address && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        >
+          {/* Address card */}
+          <div className="bg-[#0d1117] border border-white/[0.07] rounded-2xl p-5 flex flex-col gap-2">
+            <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Connected Address</p>
+            <p className="text-sm font-mono text-white break-all leading-relaxed">{wallet.address}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] text-emerald-400 font-semibold">Connected</span>
+            </div>
+          </div>
+
+          {/* Balance card */}
+          <div className="bg-[#0d1117] border border-white/[0.07] rounded-2xl p-5 flex flex-col gap-2">
+            <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Wallet Balance</p>
+            <p className="text-3xl font-black font-mono text-emerald-400">
+              {wallet.isRefreshingBalance ? (
+                <span className="text-xl text-gray-500 flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" /> Fetching…
+                </span>
+              ) : (
+                <>{wallet.balance ?? "—"} <span className="text-lg text-emerald-600">ETH</span></>
+              )}
+            </p>
+            <button
+              onClick={wallet.refreshBalance}
+              disabled={wallet.isRefreshingBalance}
+              className="mt-auto self-start flex items-center gap-1.5 text-xs text-gray-500 hover:text-white bg-white/[0.03] border border-white/[0.07] px-3 py-1.5 rounded-lg transition-all disabled:opacity-40"
+            >
+              <RefreshCwIcon className="w-3 h-3" />
+              Refresh Balance
+            </button>
+          </div>
+
+          {/* Network card */}
+          <div className="bg-[#0d1117] border border-white/[0.07] rounded-2xl p-5 flex flex-col gap-2">
+            <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Network</p>
+            <p className="text-lg font-bold text-white">{wallet.chainName ?? "Unknown"}</p>
+            <div className="flex items-center gap-2 mt-1">
+              {wallet.isTestnet ? (
+                <span className="text-[11px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full font-bold">
+                  ⚠ Testnet — safe for testing
+                </span>
+              ) : (
+                <span className="text-[11px] text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-full font-bold">
+                  🔵 Mainnet — real funds
+                </span>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Send Transaction panel */}
+      <SendTransaction wallet={wallet} isAutoProtect={isAutoProtect} />
+    </div>
+  );
+}
+
+// small inline helper to avoid import conflict with lucide RefreshCw
+function RefreshCwIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 4 23 10 17 10" />
+      <polyline points="1 20 1 14 7 14" />
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+    </svg>
+  );
+}
+
 /* ─────────────────────────────── Main Page ──────────────────────────────── */
 export default function AppDashboard() {
   const [activeView, setActiveView] = useState<ActiveView>("analyzer");
   const [isAutoProtect, setAutoProtect] = useState(true);
+  const wallet = useWallet();
 
   return (
     <div className="min-h-screen bg-[#070a10] text-white">
@@ -795,7 +885,12 @@ export default function AppDashboard() {
       </div>
 
       <Sidebar active={activeView} setActive={setActiveView} />
-      <TopBar isAutoProtect={isAutoProtect} setAutoProtect={setAutoProtect} activeView={activeView} />
+      <TopBar
+        isAutoProtect={isAutoProtect}
+        setAutoProtect={setAutoProtect}
+        activeView={activeView}
+        wallet={wallet}
+      />
 
       {/* Main content area */}
       <main className="pl-[220px] pt-[73px] relative z-10">
@@ -810,6 +905,7 @@ export default function AppDashboard() {
             >
               {activeView === "analyzer" && <AnalyzerView />}
               {activeView === "wallet-dna" && <WalletDNA />}
+              {activeView === "wallet" && <WalletView wallet={wallet} isAutoProtect={isAutoProtect} />}
               {activeView === "sandbox" && <SandboxView isAutoProtect={isAutoProtect} />}
               {activeView === "history" && <HistoryView />}
             </motion.div>
