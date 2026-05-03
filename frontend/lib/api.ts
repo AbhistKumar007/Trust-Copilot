@@ -210,3 +210,51 @@ export const compareWalletDNA = async (
   });
   return response.data;
 };
+
+/* ─── AI Copilot Chat ───────────────────────────────────────────────────────── */
+
+export interface CopilotMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface OnChainContext {
+  address: string;
+  found: boolean;
+  isKnownScam: boolean;
+  riskScore: number | null;
+  riskLevel: string;
+  verdict: string;
+  totalTransactions?: number;
+  walletAgeDays?: number;
+  failedTransactions?: number;
+  txFrequencyPerDay?: number;
+  flaggedContractCount?: number;
+  tokenDumpScore?: number;
+  suspiciousTransactionCount?: number;
+  factors?: Array<{ label: string; severity: string }>;
+  dataSource?: string;
+  error?: string;
+}
+
+export interface CopilotChatResponse {
+  success: boolean;
+  data: {
+    response: string;
+    onChainContexts: OnChainContext[] | null;
+    addressesAnalyzed: string[];
+    tokensUsed: number;
+    model: string;
+  };
+}
+
+export const copilotChat = async (
+  message: string,
+  history: CopilotMessage[] = []
+) => {
+  const response = await apiClient.post<CopilotChatResponse>("/copilot-chat", {
+    message,
+    history,
+  });
+  return response.data;
+};

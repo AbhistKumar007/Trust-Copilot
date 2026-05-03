@@ -18,6 +18,7 @@ import { DecisionCopilot } from "@/components/DecisionCopilot";
 import { WalletDNA } from "@/components/WalletDNA";
 import { WalletConnect } from "@/components/WalletConnect";
 import { SendTransaction } from "@/components/SendTransaction";
+import { AICopilotChat } from "@/components/AICopilotChat";
 import { useWallet } from "@/hooks/useWallet";
 
 /* ─────────────────────────────── helpers ─────────────────────────────────── */
@@ -912,6 +913,9 @@ export default function AppDashboard() {
           </AnimatePresence>
         </div>
       </main>
+
+      {/* AI Copilot Chat — floating bubble + slide-up panel */}
+      <AICopilotChat />
     </div>
   );
 }

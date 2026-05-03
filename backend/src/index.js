@@ -5,6 +5,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 
 const walletRoutes = require("./routes/wallet");
+const copilotRoutes = require("./routes/copilot");
 const { errorHandler } = require("./middleware/errorHandler");
 const { globalRateLimiter } = require("./middleware/rateLimiter");
 
@@ -39,6 +40,7 @@ app.get("/health", (req, res) => {
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use("/api", walletRoutes);
+app.use("/api", copilotRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -59,6 +61,7 @@ app.listen(PORT, () => {
   console.log(`   POST /api/analyze-wallet`);
   console.log(`   POST /api/risk-score`);
   console.log(`   POST /api/ai-explanation`);
+  console.log(`   POST /api/copilot-chat`);
   console.log(`   GET  /health\n`);
 });
 
