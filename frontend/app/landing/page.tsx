@@ -38,12 +38,6 @@ function cn(...classes: (string | boolean | undefined)[]) {
 /* ─────────────────────────────────────────────────────────────────────────────
    Static data
 ───────────────────────────────────────────────────────────────────────────── */
-const STATS = [
-  { label: "Wallets Analyzed", value: "2.4M+", icon: Eye },
-  { label: "Threats Blocked", value: "189K+", icon: ShieldCheck },
-  { label: "AI Accuracy", value: "99.1%", icon: Brain },
-  { label: "Avg Response", value: "<200ms", icon: Zap },
-];
 
 const FEATURES = [
   {
@@ -167,35 +161,6 @@ function Orb({
   );
 }
 
-/** A single stat card */
-function StatCard({
-  stat,
-  index,
-}: {
-  stat: (typeof STATS)[0];
-  index: number;
-}) {
-  const Icon = stat.icon;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.1, duration: 0.6 }}
-      className="glass-card p-6 flex flex-col items-center text-center group cursor-default"
-    >
-      <div className="w-12 h-12 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-        <Icon className="w-6 h-6 text-violet-400" />
-      </div>
-      <p className="text-3xl md:text-4xl font-black text-white tracking-tight mb-1">
-        {stat.value}
-      </p>
-      <p className="text-sm text-gray-500 font-medium uppercase tracking-widest">
-        {stat.label}
-      </p>
-    </motion.div>
-  );
-}
 
 /** Feature card */
 function FeatureCard({
@@ -688,10 +653,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between glass-panel px-6 py-3 rounded-2xl">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.4)]">
-                <ShieldCheck className="w-4 h-4 text-white" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)]">
+                <ShieldCheck className="w-6 h-6 text-white" />
               </div>
-              <span className="font-black text-lg tracking-tight">
+              <span className="font-black text-2xl tracking-tight">
                 Trust<span className="text-gradient">Copilot</span>
               </span>
             </div>
@@ -843,14 +808,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Stats Strip ── */}
-      <section className="relative z-10 py-16 px-6">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
-          {STATS.map((s, i) => (
-            <StatCard key={s.label} stat={s} index={i} />
-          ))}
-        </div>
-      </section>
 
       {/* ── Features ── */}
       <section id="features" className="relative z-10 py-24 px-6">
@@ -1120,15 +1077,15 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16"
           >
             {/* Brand column */}
             <div className="lg:col-span-2 flex flex-col gap-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-[0_0_24px_rgba(139,92,246,0.5)]">
-                  <ShieldCheck className="w-5 h-5 text-white" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-[0_0_24px_rgba(139,92,246,0.5)]">
+                  <ShieldCheck className="w-7 h-7 text-white" />
                 </div>
-                <span className="font-black text-xl tracking-tight text-white">
+                <span className="font-black text-3xl tracking-tight text-white">
                   Trust<span className="text-gradient">Copilot</span>
                 </span>
               </div>
@@ -1204,31 +1161,6 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            {/* Resources column */}
-            <div className="flex flex-col gap-4">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-gray-500">Resources</h4>
-              <ul className="flex flex-col gap-3">
-                {[
-                  { label: "Documentation", href: "#" },
-                  { label: "API Reference", href: "#" },
-                  { label: "GitHub Repo", href: "https://github.com" },
-                  { label: "Changelog", href: "#" },
-                  { label: "Status", href: "#" },
-                ].map((l) => (
-                  <li key={l.label}>
-                    <a
-                      href={l.href}
-                      target={l.href.startsWith("http") ? "_blank" : undefined}
-                      rel="noopener noreferrer"
-                      className="text-sm text-gray-500 hover:text-white transition-colors duration-200 flex items-center gap-1.5 group"
-                    >
-                      <span className="w-1 h-1 rounded-full bg-violet-500/0 group-hover:bg-violet-400 transition-all duration-300" />
-                      {l.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
 
             {/* Company column */}
             <div className="flex flex-col gap-4">
