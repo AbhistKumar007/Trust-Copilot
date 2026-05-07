@@ -9,7 +9,7 @@ import {
   Activity, Settings, Bell, ChevronRight, Shield,
   AlertTriangle, XOctagon, TrendingUp, Clock,
   Globe, Cpu, ExternalLink, Copy, CheckCircle2,
-  Home, ArrowLeft, Dna, Wallet,
+  Home, ArrowLeft, Dna, Wallet, CreditCard,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { analyzeWallet, preTransactionCheck, getAIDecision, type AnalysisResponse, type PreTransactionCheckResponse, type AIDecisionResponse } from "@/lib/api";
@@ -19,6 +19,7 @@ import { WalletDNA } from "@/components/WalletDNA";
 import { WalletConnect } from "@/components/WalletConnect";
 import { SendTransaction } from "@/components/SendTransaction";
 import { AICopilotChat } from "@/components/AICopilotChat";
+import { WalletPersonalityCard } from "@/components/WalletPersonalityCard";
 import { useWallet } from "@/hooks/useWallet";
 
 /* ─────────────────────────────── helpers ─────────────────────────────────── */
@@ -850,6 +851,16 @@ function WalletView({ wallet, isAutoProtect }: { wallet: ReturnType<typeof useWa
             </div>
           </div>
         </motion.div>
+      )}
+
+      {/* Wallet Personality Card */}
+      {wallet.address && (
+        <WalletPersonalityCard
+          address={wallet.address}
+          balance={wallet.balance}
+          chainId={wallet.chainId}
+          inline
+        />
       )}
 
       {/* Send Transaction panel */}

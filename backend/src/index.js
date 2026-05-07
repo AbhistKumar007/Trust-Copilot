@@ -6,6 +6,7 @@ const morgan = require("morgan");
 
 const walletRoutes = require("./routes/wallet");
 const copilotRoutes = require("./routes/copilot");
+const personalityRoutes = require("./routes/personality");
 const { errorHandler } = require("./middleware/errorHandler");
 const { globalRateLimiter } = require("./middleware/rateLimiter");
 
@@ -41,6 +42,7 @@ app.get("/health", (req, res) => {
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use("/api", walletRoutes);
 app.use("/api", copilotRoutes);
+app.use("/api", personalityRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -62,6 +64,7 @@ app.listen(PORT, () => {
   console.log(`   POST /api/risk-score`);
   console.log(`   POST /api/ai-explanation`);
   console.log(`   POST /api/copilot-chat`);
+  console.log(`   POST /api/wallet-personality`);
   console.log(`   GET  /health\n`);
 });
 

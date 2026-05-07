@@ -7,6 +7,7 @@ import {
   CheckCircle2, AlertTriangle, Loader2, ExternalLink,
 } from "lucide-react";
 import { NetworkBadge } from "./NetworkBadge";
+import { PersonalityCardTrigger } from "./WalletPersonalityCard";
 import type { UseWalletReturn } from "@/hooks/useWallet";
 
 // ─── Helper ────────────────────────────────────────────────────────────────────
@@ -186,6 +187,15 @@ export function WalletConnect({ wallet }: WalletConnectProps) {
                   View on Explorer
                 </a>
               )}
+
+              {/* Identity Card shortcut */}
+              <div className="px-3 py-1.5">
+                <PersonalityCardTrigger
+                  address={wallet.address!}
+                  balance={wallet.balance}
+                  chainId={wallet.chainId}
+                />
+              </div>
 
               <div className="border-t border-white/[0.05] mt-1 pt-1">
                 <button

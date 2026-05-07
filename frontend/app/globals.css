@@ -96,6 +96,51 @@ body {
   100% { background-position: -200% center; }
 }
 
+/* ── Wallet Personality Card animations ─────────────────────────────────── */
+@keyframes card-shimmer {
+  0%   { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(350%) rotate(25deg); }
+}
+
+@keyframes card-float {
+  0%   { transform: translateY(0px) rotate(0deg); }
+  33%  { transform: translateY(-6px) rotate(0.5deg); }
+  66%  { transform: translateY(-3px) rotate(-0.3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes orb-drift-1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(12px, -18px) scale(1.08); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes orb-drift-2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(-10px, 14px) scale(0.94); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes stat-fill {
+  from { width: 0%; }
+}
+
+.personality-card-float {
+  animation: card-float 6s ease-in-out infinite;
+}
+
+.personality-card-shimmer {
+  animation: card-shimmer 3.5s ease-in-out infinite;
+}
+
+.personality-orb-1 {
+  animation: orb-drift-1 8s ease-in-out infinite;
+}
+
+.personality-orb-2 {
+  animation: orb-drift-2 10s ease-in-out infinite;
+}
+
 .animate-gradient-x {
   animation: gradient-x 15s ease infinite;
   background-size: 200% 200%;
