@@ -27,7 +27,7 @@ Make sure you have Node.js (v18+) and npm installed.
 
 ### 1. Clone & Install Dependencies
 \`\`\`bash
-git clone https://github.com/YOUR_USERNAME/trustcopilot.git
+git clone https://github.com/AbhistKumar007/trustcopilot.git
 cd trustcopilot
 
 # Install backend dependencies
