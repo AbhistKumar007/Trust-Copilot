@@ -33,7 +33,7 @@ cd trustcopilot
 # Install backend dependencies
 cd backend
 npm install
-cd ..
+cd ...
 
 # Install frontend dependencies
 cd frontend
