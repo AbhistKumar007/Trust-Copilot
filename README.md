@@ -20,7 +20,7 @@ AI-powered crypto trust and decision engine. TrustCopilot acts as an intelligent
 * **AI Engine**: OpenAI API / Claude
 * **Security**: Helmet, Express-Rate-Limit
 
-## 🚀 Setup Instructions
+## 🚀 Setup Instructions.
 
 ### Prerequisites
 Make sure you have Node.js (v18+) and npm installed.
@@ -75,7 +75,7 @@ npm run dev
 3. **Get AI Decision:** Review the natural language explanation and risk decision prior to engaging with an unknown wallet. 
 4. **Send Secure Transactions:** Launch Auto-Protect mode from the Dashboard and simulate transactions.
 
-## 🔐 Security
+## 🔐 Security 
 TrustCopilot ensures user safety by employing read-only non-custodial methodologies:
 - We never ask for seed phrases or private keys in the UI.
 - API keys, secrets, and environments are ignored strictly via \`.gitignore\`.
